@@ -1,15 +1,26 @@
 import { useState } from "react";
 
+// Paleta idêntica ao HoraHora
 const C = {
-  blue: "#003A8C", blueLight: "#0057D9", bluePale: "#E8F0FB",
-  gray: "#F4F6FA", grayMid: "#C8D0DE", grayDark: "#6B7A99",
-  success: "#0A7A4B", successLight: "#E6F4EF",
-  danger: "#C0392B", dangerLight: "#FDECEA",
-  warning: "#D97706", warningLight: "#FFF7ED",
-  text: "#0D1B3E", white: "#FFFFFF",
-  agpBlue: "#4A7FA5",
+  blue: "#003A8C",
+  blueLight: "#0057D9",
+  bluePale: "#E8F0FB",
+  gray: "#F4F6FA",
+  grayMid: "#C8D0DE",
+  grayDark: "#6B7A99",
+  success: "#0A7A4B",
+  successLight: "#E6F4EF",
+  danger: "#C0392B",
+  dangerLight: "#FDECEA",
+  warning: "#D97706",
+  warningLight: "#FFF7ED",
+  text: "#0D1B3E",
+  white: "#FFFFFF",
+  purple: "#7C3AED",
+  purpleLight: "#EDE9FE",
 };
 
+// Logo AGP oficial
 const LOGO = "https://www.agpglass.com/themes/custom/agp/logo.svg";
 
 const TURNOS = ["1º Turno", "2º Turno", "3º Turno"];
@@ -78,9 +89,10 @@ const MOCK = [
 function Card({ children, style }) {
   return (
     <div style={{
-      background: C.white, borderRadius: 14, padding: 18,
-      boxShadow: "0 1px 3px rgba(13,27,62,0.08)",
-      border: `1px solid ${C.grayMid}40`, ...style,
+      background: C.white, borderRadius: 12, padding: 20,
+      boxShadow: "0 1px 3px rgba(13,27,62,0.1)",
+      border: `1px solid ${C.grayMid}50`, 
+      ...style,
     }}>{children}</div>
   );
 }
@@ -142,15 +154,15 @@ function Toggle({ label, value, onChange, descValue, onDescChange, descPlacehold
 function FormCorte({ form, set, onSubmit }) {
   return (
     <>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14, marginBottom: 14 }}>
         <Field label="Matrícula"><TextInput value={form.matricula} onChange={(e) => set("matricula", e.target.value)} placeholder="Ex: 3789" /></Field>
         <Field label="Turno"><Select value={form.turno} onChange={(e) => set("turno", e.target.value)}>{TURNOS.map((t) => <option key={t}>{t}</option>)}</Select></Field>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14, marginBottom: 14 }}>
         <Field label="Painéis cortados no turno"><TextInput type="number" value={form.paineisCortados} onChange={(e) => set("paineisCortados", e.target.value)} placeholder="0" /></Field>
         <Field label="Painéis pendentes de corte"><TextInput type="number" value={form.paineisPendentes} onChange={(e) => set("paineisPendentes", e.target.value)} placeholder="0" /></Field>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14, marginBottom: 14 }}>
         <Field label="Lâmina"><Select value={form.lamina} onChange={(e) => set("lamina", e.target.value)}><option value="boa">Boa</option><option value="trocar">Precisa trocar</option></Select></Field>
         <Field label="Status do PU"><Select value={form.statusPU} onChange={(e) => set("statusPU", e.target.value)}><option value="ok">OK</option><option value="baixo">Estoque baixo</option><option value="repor">Repor urgente</option></Select></Field>
       </div>
@@ -166,11 +178,11 @@ function FormCorte({ form, set, onSubmit }) {
 function FormEmbolsamento({ form, set, onSubmit }) {
   return (
     <>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14, marginBottom: 14 }}>
         <Field label="Matrícula"><TextInput value={form.matricula} onChange={(e) => set("matricula", e.target.value)} placeholder="Ex: 4102" /></Field>
         <Field label="Turno"><Select value={form.turno} onChange={(e) => set("turno", e.target.value)}>{TURNOS.map((t) => <option key={t}>{t}</option>)}</Select></Field>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14, marginBottom: 14 }}>
         <Field label="Painéis embolsados (prontos p/ autoclave)"><TextInput type="number" value={form.paineisEmbolsados} onChange={(e) => set("paineisEmbolsados", e.target.value)} placeholder="0" /></Field>
         <Field label="Fila aguardando embolsamento"><TextInput type="number" value={form.filaAguardando} onChange={(e) => set("filaAguardando", e.target.value)} placeholder="0" /></Field>
       </div>
@@ -299,9 +311,16 @@ function Dashboard({ registros }) {
   const ultimoPorSetor = (id) => registros.filter((r) => r.setor === id).sort((a, b) => b.id - a.id)[0];
   return (
     <div>
-      <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 4 }}>Última passagem por setor</h2>
-      <p style={{ color: C.grayDark, fontSize: 14, marginBottom: 18 }}>O que o turno anterior deixou registrado.</p>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
+      <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 6, color: C.text }}>Última passagem por setor</h2>
+      <p style={{ color: C.grayDark, fontSize: 14, marginBottom: 22 }}>O que o turno anterior deixou registrado.</p>
+      <div style={{ 
+        display: "grid", 
+        gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", 
+        gap: 18,
+        "@media (max-width: 768px)": {
+          gridTemplateColumns: "1fr",
+        }
+      }}>
         {SETORES.map((s) => <DashCardSetor key={s.id} setor={s.id} registro={ultimoPorSetor(s.id)} />)}
       </div>
     </div>
@@ -392,32 +411,43 @@ export default function App() {
   return (
     <div style={{ minHeight: "100vh", background: C.gray }}>
       {/* Header */}
-      <div style={{ background: C.blue, padding: "16px 20px" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
-          <img src={LOGO} alt="AGP" style={{ height: 30, filter: "brightness(0) invert(1)" }} onError={(e) => { e.target.style.display = "none"; }} />
-          <div>
-            <div style={{ color: C.white, fontSize: 20, fontWeight: 800, lineHeight: 1.1 }}>AGP TrocaTurno</div>
-            <div style={{ color: "#FFFFFFAA", fontSize: 12 }}>Passagem de Turno Digital · Setor Opaco</div>
+      <div style={{ background: C.blue, padding: "14px 20px", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
+        <div style={{ maxWidth: 1240, margin: "0 auto" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", marginBottom: 14 }}>
+            <img 
+              src={LOGO} 
+              alt="AGP" 
+              style={{ height: 32, filter: "brightness(0) invert(1)" }} 
+              onError={(e) => { 
+                e.target.style.display = "none"; 
+                e.target.parentElement.insertAdjacentHTML("beforeend", '<div style="color:white;fontWeight:800;fontSize:18">AGP</div>');
+              }} 
+            />
+            <div>
+              <div style={{ color: C.white, fontSize: 22, fontWeight: 800, lineHeight: 1, margin: 0 }}>AGP TrocaTurno</div>
+              <div style={{ color: "#FFFFFFBB", fontSize: 12, margin: 0 }}>Passagem de Turno Digital · Setor Opaco</div>
+            </div>
           </div>
-        </div>
-        <div style={{ maxWidth: 1100, margin: "14px auto 0", display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {tabBtn("dashboard", "📊 Dashboard")}
-          {tabBtn("registrar", "📝 Registrar")}
-          {tabBtn("historico", "📋 Histórico")}
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            {tabBtn("dashboard", "📊 Dashboard")}
+            {tabBtn("registrar", "📝 Registrar")}
+            {tabBtn("historico", "📋 Histórico")}
+          </div>
         </div>
       </div>
 
       {/* Conteúdo */}
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "22px 20px 60px" }}>
+      <div style={{ maxWidth: 1240, margin: "0 auto", padding: "24px 20px 60px" }}>
         {aba === "dashboard" && <Dashboard registros={registros} />}
         {aba === "historico" && <Historico registros={registros} />}
         {aba === "registrar" && (
           <div>
-            <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 14 }}>Registrar passagem de turno</h2>
-            <div style={{ display: "flex", gap: 8, marginBottom: 18, flexWrap: "wrap" }}>
+            <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 6, color: C.text }}>Registrar passagem de turno</h2>
+            <p style={{ color: C.grayDark, fontSize: 14, marginBottom: 20 }}>Preencha o formulário do setor correspondente.</p>
+            <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
               {SETORES.map((s) => <FiltroBtn key={s.id} ativo={setorAtivo === s.id} onClick={() => setSetorAtivo(s.id)}>{s.icon} {s.nome}</FiltroBtn>)}
             </div>
-            <Card style={{ maxWidth: 720 }}>
+            <Card style={{ maxWidth: 800 }}>
               {setorAtivo === "corte" && <FormCorte form={fCorte} set={setCorte} onSubmit={() => registrar("corte", fCorte, setFCorte, FORM_CORTE)} />}
               {setorAtivo === "embolsamento" && <FormEmbolsamento form={fEmb} set={setEmb} onSubmit={() => registrar("embolsamento", fEmb, setFEmb, FORM_EMBOLSAMENTO)} />}
               {setorAtivo === "audaces" && <FormAudaces form={fAud} set={setAud} onSubmit={() => registrar("audaces", fAud, setFAud, FORM_AUDACES)} />}

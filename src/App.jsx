@@ -254,55 +254,57 @@ function DashCardSetor({ setor, registro }) {
     return (
       <Card>
         <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 8 }}>{meta.icon} {meta.nome}</div>
-        <div style={{ color: C.grayDark, fontSize: 14 }}>Nenhuma passagem registrada ainda.</div>
+        <div style={{ color: C.grayDark, fontSize: 13 }}>Nenhuma passagem registrada ainda.</div>
       </Card>
     );
   }
   const alertas = alertasDoRegistro(registro);
   return (
     <Card>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
-        <div style={{ fontSize: 16, fontWeight: 800 }}>{meta.icon} {meta.nome}</div>
-        <div style={{ textAlign: "right", fontSize: 12, color: C.grayDark }}>
-          <div>{registro.turno}</div>
-          <div>{registro.data} · {registro.hora}</div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14, gap: 12 }}>
+        <div style={{ fontSize: 18, fontWeight: 800, color: C.text }}>{meta.icon} {meta.nome}</div>
+        <div style={{ textAlign: "right", fontSize: 12, color: C.grayDark, flexShrink: 0 }}>
+          <div style={{ fontWeight: 600 }}>{registro.turno}</div>
+          <div style={{ fontSize: 11 }}>{registro.data} · {registro.hora}</div>
         </div>
       </div>
 
       {alertas.length > 0 && (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 12 }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 7, marginBottom: 14 }}>
           {alertas.map((a, i) => <Badge key={i} tone={a.tone}>{a.txt}</Badge>)}
         </div>
       )}
 
-      <div style={{ fontSize: 14, lineHeight: 1.7, color: C.text }}>
+      <div style={{ fontSize: 15, lineHeight: 1.8, color: C.text, marginBottom: 14, background: C.gray, borderRadius: 10, padding: "12px 14px" }}>
         {setor === "corte" && (<>
-          <div>Cortados: <b>{registro.paineisCortados}</b> · Pendentes: <b>{registro.paineisPendentes}</b></div>
-          <div>Material: <b>{registro.materialEstoque || "—"}</b></div>
+          <div><b>Cortados:</b> {registro.paineisCortados} | <b>Pendentes:</b> {registro.paineisPendentes}</div>
+          <div><b>Material:</b> {registro.materialEstoque}</div>
         </>)}
         {setor === "embolsamento" && (<>
-          <div>Embolsados: <b>{registro.paineisEmbolsados}</b> · Fila: <b>{registro.filaAguardando}</b></div>
+          <div><b>Embolsados:</b> {registro.paineisEmbolsados} | <b>Fila:</b> {registro.filaAguardando}</div>
         </>)}
         {setor === "audaces" && (<>
-          <div>Programa: <b>{registro.programaRodando || "—"}</b></div>
-          <div>Por carro: <b>{registro.paineisPorCarro || "—"}</b></div>
+          <div><b>Programa:</b> {registro.programaRodando}</div>
+          <div><b>Por carro:</b> {registro.paineisPorCarro}</div>
         </>)}
       </div>
 
       {registro.observacao && (
-        <div style={{ marginTop: 12, background: C.gray, borderRadius: 9, padding: "10px 12px", fontSize: 13, color: C.text }}>
-          <b style={{ color: C.grayDark }}>📝 Obs:</b> {registro.observacao}
+        <div style={{ marginBottom: 12, background: C.bluePale, borderRadius: 10, padding: "12px 14px", fontSize: 13, color: C.text, borderLeft: `4px solid ${C.blue}` }}>
+          <b style={{ color: C.blue }}>📝 Observação:</b> {registro.observacao}
         </div>
       )}
+
       {(registro.incidenteSegDesc || registro.equipProblemaDesc || registro.paradaMaquinaDesc || registro.manutencaoPendenteDesc) && (
-        <div style={{ marginTop: 8, background: C.dangerLight, borderRadius: 9, padding: "10px 12px", fontSize: 13, color: C.danger }}>
-          {registro.incidenteSegDesc && <div>⚠️ {registro.incidenteSegDesc}</div>}
-          {registro.equipProblemaDesc && <div>🔧 {registro.equipProblemaDesc}</div>}
-          {registro.paradaMaquinaDesc && <div>⏸️ {registro.paradaMaquinaDesc}</div>}
-          {registro.manutencaoPendenteDesc && <div>🔧 {registro.manutencaoPendenteDesc}</div>}
+        <div style={{ marginBottom: 12, background: C.dangerLight, borderRadius: 10, padding: "12px 14px", fontSize: 13, color: C.danger, borderLeft: `4px solid ${C.danger}` }}>
+          {registro.incidenteSegDesc && <div>⚠️ <b>Incidente:</b> {registro.incidenteSegDesc}</div>}
+          {registro.equipProblemaDesc && <div>🔧 <b>Equipamento:</b> {registro.equipProblemaDesc}</div>}
+          {registro.paradaMaquinaDesc && <div>⏸️ <b>Parada:</b> {registro.paradaMaquinaDesc}</div>}
+          {registro.manutencaoPendenteDesc && <div>🔧 <b>Manutenção:</b> {registro.manutencaoPendenteDesc}</div>}
         </div>
       )}
-      <div style={{ marginTop: 10, fontSize: 12, color: C.grayDark }}>Registrado por matrícula <b>{registro.matricula}</b></div>
+
+      <div style={{ fontSize: 12, color: C.grayDark }}>Registrado por <b>mat. {registro.matricula}</b></div>
     </Card>
   );
 }
@@ -401,34 +403,36 @@ export default function App() {
 
   const tabBtn = (id, label) => (
     <button onClick={() => setAba(id)} style={{
-      padding: "10px 16px", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer",
+      padding: "9px 14px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer",
       border: "none", background: aba === id ? C.white : "transparent",
-      color: aba === id ? C.blue : "#FFFFFFCC",
+      color: aba === id ? C.blue : "#FFFFFFDD", whiteSpace: "nowrap",
       boxShadow: aba === id ? "0 1px 4px rgba(0,0,0,0.12)" : "none",
+      transition: "all 0.2s",
     }}>{label}</button>
   );
 
   return (
-    <div style={{ minHeight: "100vh", background: C.gray }}>
+    <div style={{ minHeight: "100vh", background: C.gray, overflowX: "hidden" }}>
       {/* Header */}
-      <div style={{ background: C.blue, padding: "14px 20px", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
+      <div style={{ background: C.blue, padding: "12px 16px", boxShadow: "0 2px 8px rgba(0,0,0,0.12)", position: "sticky", top: 0, zIndex: 100 }}>
         <div style={{ maxWidth: 1240, margin: "0 auto" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", marginBottom: 14 }}>
+          {/* Logo + Título */}
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
             <img 
               src={LOGO} 
               alt="AGP" 
-              style={{ height: 32, filter: "brightness(0) invert(1)" }} 
+              style={{ height: 28, filter: "brightness(0) invert(1)" }} 
               onError={(e) => { 
                 e.target.style.display = "none"; 
-                e.target.parentElement.insertAdjacentHTML("beforeend", '<div style="color:white;fontWeight:800;fontSize:18">AGP</div>');
               }} 
             />
-            <div>
-              <div style={{ color: C.white, fontSize: 22, fontWeight: 800, lineHeight: 1, margin: 0 }}>AGP TrocaTurno</div>
-              <div style={{ color: "#FFFFFFBB", fontSize: 12, margin: 0 }}>Passagem de Turno Digital · Setor Opaco</div>
+            <div style={{ flex: 1 }}>
+              <div style={{ color: C.white, fontSize: 20, fontWeight: 800, lineHeight: 1, margin: 0 }}>AGP TrocaTurno</div>
+              <div style={{ color: "#FFFFFFAA", fontSize: 11, margin: 0 }}>Passagem de Turno · Setor Opaco</div>
             </div>
           </div>
-          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+          {/* Tabs */}
+          <div style={{ display: "flex", gap: 4, overflowX: "auto", paddingBottom: 2 }}>
             {tabBtn("dashboard", "📊 Dashboard")}
             {tabBtn("registrar", "📝 Registrar")}
             {tabBtn("historico", "📋 Histórico")}
@@ -437,14 +441,14 @@ export default function App() {
       </div>
 
       {/* Conteúdo */}
-      <div style={{ maxWidth: 1240, margin: "0 auto", padding: "24px 20px 60px" }}>
+      <div style={{ maxWidth: 1240, margin: "0 auto", padding: "20px 16px 60px" }}>
         {aba === "dashboard" && <Dashboard registros={registros} />}
         {aba === "historico" && <Historico registros={registros} />}
         {aba === "registrar" && (
           <div>
-            <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 6, color: C.text }}>Registrar passagem de turno</h2>
-            <p style={{ color: C.grayDark, fontSize: 14, marginBottom: 20 }}>Preencha o formulário do setor correspondente.</p>
-            <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
+            <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4, color: C.text }}>Registrar passagem de turno</h2>
+            <p style={{ color: C.grayDark, fontSize: 13, marginBottom: 18 }}>Preencha o formulário do setor correspondente.</p>
+            <div style={{ display: "flex", gap: 8, marginBottom: 18, flexWrap: "wrap", overflowX: "auto" }}>
               {SETORES.map((s) => <FiltroBtn key={s.id} ativo={setorAtivo === s.id} onClick={() => setSetorAtivo(s.id)}>{s.icon} {s.nome}</FiltroBtn>)}
             </div>
             <Card style={{ maxWidth: 800 }}>

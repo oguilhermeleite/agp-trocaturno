@@ -1,16 +1,88 @@
-# React + Vite
+# 🔄 AGP TrocaTurno
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Passagem de Turno Digital** para o Setor Opaco da AGP sGlass Brasil.
 
-Currently, two official plugins are available:
+Sistema web que substitui a passagem de turno manual, permitindo que cada setor (Corte, Embolsamento, Audaces) registre um checklist estruturado ao final do turno, deixando tudo documentado para o próximo turno.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🎯 Funcionalidades
 
-## React Compiler
+- **📊 Dashboard**: Visualiza a última passagem de cada setor com alertas de segurança, equipamentos com problema e pendências
+- **📝 Registrar**: Formulários específicos por setor com checklist, toggles de incidentes e campo de observação livre
+- **📋 Histórico**: Lista completa de todas as passagens, filtrável por setor e data
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🏗️ Setores
 
-## Expanding the ESLint configuration
+### ✂️ Corte
+- Painéis cortados / pendentes
+- Status da lâmina
+- Material (aramida) em estoque
+- Status do PU
+- Incidentes de segurança
+- Equipamentos com problema
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 📦 Embolsamento
+- Painéis embolsados / fila
+- Status de consumíveis (bolsas, fitas)
+- Incidentes de segurança
+- Equipamentos com problema
+
+### 🖥️ Audaces
+- Programa / arquivo em execução
+- Painéis cortados por carro
+- Paradas de máquina
+- Manutenção pendente
+
+## 🚀 Stack
+
+- **React 18** + Vite
+- **Styled-Components** (inline CSS)
+- Deploy: **Vercel**
+
+## 📦 Instalação
+
+```bash
+git clone https://github.com/oguilhermeleite/agp-trocaturno.git
+cd agp-trocaturno
+npm install
+npm run dev
+```
+
+## 🔧 Build & Deploy
+
+```bash
+# Build para produção
+npm run build
+
+# Preview do build
+npm run preview
+```
+
+Deploy automático no Vercel — acesso via: https://agp-trocaturno.vercel.app
+
+## 📄 Estrutura
+
+```
+src/
+├── App.jsx           # App principal com todas as abas
+├── main.jsx          # Entrada React
+└── index.css         # Estilos base
+```
+
+## 🎨 Design
+
+- Paleta: Azul AGP (#003A8C) + cinzas neutros
+- Badges de alerta: Vermelho (erro), Laranja (aviso)
+- Responsivo: Mobile-first, desktop-optimized
+- Logo AGP carregada do site oficial
+
+## 👨‍💻 Autor
+
+Desenvolvido por Guilherme Leite ([oguilhermeleite](https://github.com/oguilhermeleite))
+
+## 📞 Contato / Feedback
+
+Dúvidas ou sugestões? Abra uma issue no repositório.
+
+---
+
+**AGP TrocaTurno** · Setor Opaco · 2026

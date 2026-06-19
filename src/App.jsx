@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-// Paleta idêntica ao HoraHora
+// Colors - Professional palette
 const C = {
   blue: "#003A8C",
   blueLight: "#0057D9",
@@ -8,6 +8,7 @@ const C = {
   gray: "#F4F6FA",
   grayMid: "#C8D0DE",
   grayDark: "#6B7A99",
+  grayDarker: "#3F4A5E",
   success: "#0A7A4B",
   successLight: "#E6F4EF",
   danger: "#C0392B",
@@ -20,78 +21,69 @@ const C = {
   purpleLight: "#EDE9FE",
 };
 
-// Logo AGP oficial
 const LOGO = "https://www.agpglass.com/themes/custom/agp/logo.svg";
-
 const TURNOS = ["1º Turno", "2º Turno", "3º Turno"];
-
 const SETORES = [
-  { id: "corte", nome: "Corte", icon: "✂️" },
-  { id: "embolsamento", nome: "Embolsamento", icon: "📦" },
-  { id: "audaces", nome: "Audaces", icon: "🖥️" },
+  { id: "corte", nome: "Corte" },
+  { id: "embolsamento", nome: "Embolsamento" },
+  { id: "audaces", nome: "Audaces" },
 ];
 
-// ---------- Form inicial por setor ----------
-const FORM_CORTE = {
-  matricula: "", turno: "1º Turno",
-  paineisCortados: "", lamina: "boa", materialEstoque: "",
-  paineisPendentes: "", statusPU: "ok",
-  incidenteSeg: false, incidenteSegDesc: "",
-  equipProblema: false, equipProblemaDesc: "",
-  observacao: "",
-};
-const FORM_EMBOLSAMENTO = {
-  matricula: "", turno: "1º Turno",
-  paineisEmbolsados: "", filaAguardando: "", consumiveis: "ok",
-  incidenteSeg: false, incidenteSegDesc: "",
-  equipProblema: false, equipProblemaDesc: "",
-  observacao: "",
-};
-const FORM_AUDACES = {
-  matricula: "", turno: "1º Turno",
-  programaRodando: "", paineisPorCarro: "",
-  paradaMaquina: false, paradaMaquinaDesc: "",
-  manutencaoPendente: false, manutencaoPendenteDesc: "",
-  observacao: "",
+const TIPOS_ANOMALIA = [
+  "Defeito em painel",
+  "Equipamento parou",
+  "Material com problema",
+  "Qualidade baixa",
+  "Parada de produção",
+  "Outro",
+];
+
+const FORM_ANOMALIA = {
+  matricula: "", turno: "1º Turno", setor: "corte",
+  tipoAnomalia: "Defeito em painel",
+  descricao: "", causaRaiz: "",
+  acaoTomada: "", resultado: "resolvido",
+  duracaoParada: "",
 };
 
-// ---------- Mock de dados iniciais ----------
 const hoje = new Date().toLocaleDateString("pt-BR");
-const MOCK = [
+const MOCK_ANOMALIAS = [
   {
-    id: 1, setor: "corte", data: hoje, turno: "1º Turno", matricula: "3789",
-    paineisCortados: 42, lamina: "boa", materialEstoque: "8 rolos",
-    paineisPendentes: 3, statusPU: "ok",
-    incidenteSeg: false, incidenteSegDesc: "",
-    equipProblema: false, equipProblemaDesc: "",
-    observacao: "Corte fluindo normal. PU reposto no início do turno.",
-    hora: "15:02",
+    id: 1, matricula: "3789", turno: "1º Turno", setor: "corte", data: hoje,
+    tipoAnomalia: "Equipamento parou", descricao: "Lâmina do corte travou",
+    causaRaiz: "Acúmulo de resíduos de aramida",
+    acaoTomada: "Limpeza com ar comprimido a 6 bar", resultado: "resolvido",
+    duracaoParada: "15", hora: "10:30",
   },
   {
-    id: 2, setor: "embolsamento", data: hoje, turno: "1º Turno", matricula: "4102",
-    paineisEmbolsados: 38, filaAguardando: 4, consumiveis: "baixo",
-    incidenteSeg: false, incidenteSegDesc: "",
-    equipProblema: true, equipProblemaDesc: "Seladora 2 esquentando demais, abrir chamado.",
-    observacao: "Estoque de bolsas baixo, pedir reposição.",
-    hora: "15:05",
-  },
-  {
-    id: 3, setor: "audaces", data: hoje, turno: "1º Turno", matricula: "3651",
-    programaRodando: "Programa MX-220", paineisPorCarro: "Carro A: 12 / Carro B: 8",
-    paradaMaquina: false, paradaMaquinaDesc: "",
-    manutencaoPendente: false, manutencaoPendenteDesc: "",
-    observacao: "Carro B ficou pela metade, próximo turno continua.",
-    hora: "15:08",
+    id: 2, matricula: "4102", turno: "1º Turno", setor: "embolsamento", data: hoje,
+    tipoAnomalia: "Material com problema", descricao: "Bolsas com furos pequenos",
+    causaRaiz: "Fornecedor enviou lote com defeito",
+    acaoTomada: "Separação manual e contato com fornecedor", resultado: "parcial",
+    duracaoParada: "45", hora: "14:15",
   },
 ];
 
-// ================= COMPONENTES BASE =================
+const MOCK_LICOES = [
+  {
+    id: 1, setor: "corte", problema: "Lâmina enferrujando",
+    causa: "Umidade alta e falta de lubrificação", acao: "Aplicar óleo de silicone a cada 4h",
+    frequencia: 7, ultimaOcorrencia: hoje,
+  },
+  {
+    id: 2, setor: "audaces", problema: "Carro travando",
+    causa: "Programação de velocidade inadequada", acao: "Reduzir velocidade em 20% no programa",
+    frequencia: 5, ultimaOcorrencia: hoje,
+  },
+];
+
+// ============= BASE COMPONENTS =============
 function Card({ children, style }) {
   return (
     <div style={{
       background: C.white, borderRadius: 12, padding: 20,
       boxShadow: "0 1px 3px rgba(13,27,62,0.1)",
-      border: `1px solid ${C.grayMid}50`, 
+      border: "1px solid " + C.grayMid + "50",
       ...style,
     }}>{children}</div>
   );
@@ -108,7 +100,7 @@ function Field({ label, children }) {
 
 const inputStyle = {
   width: "100%", padding: "10px 12px", borderRadius: 9,
-  border: `1px solid ${C.grayMid}`, fontSize: 14, color: C.text,
+  border: "1px solid " + C.grayMid, fontSize: 14, color: C.text,
   background: C.white, outline: "none",
 };
 
@@ -120,109 +112,6 @@ function TextArea(props) {
   return <textarea {...props} rows={3} style={{ ...inputStyle, resize: "vertical", ...props.style }} />;
 }
 
-function Toggle({ label, value, onChange, descValue, onDescChange, descPlaceholder }) {
-  return (
-    <div style={{ marginBottom: 14 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-        <span style={{ fontSize: 13, fontWeight: 600, color: C.grayDark }}>{label}</span>
-        <button
-          onClick={() => onChange(!value)}
-          style={{
-            position: "relative", width: 52, height: 28, borderRadius: 14,
-            border: "none", cursor: "pointer", flexShrink: 0,
-            background: value ? C.danger : C.grayMid, transition: "background .2s",
-          }}
-        >
-          <span style={{
-            position: "absolute", top: 3, left: value ? 27 : 3, width: 22, height: 22,
-            borderRadius: "50%", background: C.white, transition: "left .2s",
-          }} />
-        </button>
-      </div>
-      {value && (
-        <TextArea
-          value={descValue} onChange={(e) => onDescChange(e.target.value)}
-          placeholder={descPlaceholder || "Descreva..."}
-          style={{ marginTop: 8, borderColor: C.danger }}
-        />
-      )}
-    </div>
-  );
-}
-
-// ================= FORMULÁRIOS =================
-function FormCorte({ form, set, onSubmit }) {
-  return (
-    <>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14, marginBottom: 14 }}>
-        <Field label="Matrícula"><TextInput value={form.matricula} onChange={(e) => set("matricula", e.target.value)} placeholder="Ex: 3789" /></Field>
-        <Field label="Turno"><Select value={form.turno} onChange={(e) => set("turno", e.target.value)}>{TURNOS.map((t) => <option key={t}>{t}</option>)}</Select></Field>
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14, marginBottom: 14 }}>
-        <Field label="Painéis cortados no turno"><TextInput type="number" value={form.paineisCortados} onChange={(e) => set("paineisCortados", e.target.value)} placeholder="0" /></Field>
-        <Field label="Painéis pendentes de corte"><TextInput type="number" value={form.paineisPendentes} onChange={(e) => set("paineisPendentes", e.target.value)} placeholder="0" /></Field>
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14, marginBottom: 14 }}>
-        <Field label="Lâmina"><Select value={form.lamina} onChange={(e) => set("lamina", e.target.value)}><option value="boa">Boa</option><option value="trocar">Precisa trocar</option></Select></Field>
-        <Field label="Status do PU"><Select value={form.statusPU} onChange={(e) => set("statusPU", e.target.value)}><option value="ok">OK</option><option value="baixo">Estoque baixo</option><option value="repor">Repor urgente</option></Select></Field>
-      </div>
-      <Field label="Material (aramida) em estoque"><TextInput value={form.materialEstoque} onChange={(e) => set("materialEstoque", e.target.value)} placeholder="Ex: 8 rolos" /></Field>
-      <Toggle label="Incidente de segurança?" value={form.incidenteSeg} onChange={(v) => set("incidenteSeg", v)} descValue={form.incidenteSegDesc} onDescChange={(v) => set("incidenteSegDesc", v)} descPlaceholder="Descreva o incidente / quase-acidente" />
-      <Toggle label="Equipamento com problema?" value={form.equipProblema} onChange={(v) => set("equipProblema", v)} descValue={form.equipProblemaDesc} onDescChange={(v) => set("equipProblemaDesc", v)} descPlaceholder="Qual equipamento e o problema" />
-      <Field label="Observação"><TextArea value={form.observacao} onChange={(e) => set("observacao", e.target.value)} placeholder="Observação livre para o próximo turno..." /></Field>
-      <SubmitBtn onClick={onSubmit} />
-    </>
-  );
-}
-
-function FormEmbolsamento({ form, set, onSubmit }) {
-  return (
-    <>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14, marginBottom: 14 }}>
-        <Field label="Matrícula"><TextInput value={form.matricula} onChange={(e) => set("matricula", e.target.value)} placeholder="Ex: 4102" /></Field>
-        <Field label="Turno"><Select value={form.turno} onChange={(e) => set("turno", e.target.value)}>{TURNOS.map((t) => <option key={t}>{t}</option>)}</Select></Field>
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14, marginBottom: 14 }}>
-        <Field label="Painéis embolsados (prontos p/ autoclave)"><TextInput type="number" value={form.paineisEmbolsados} onChange={(e) => set("paineisEmbolsados", e.target.value)} placeholder="0" /></Field>
-        <Field label="Fila aguardando embolsamento"><TextInput type="number" value={form.filaAguardando} onChange={(e) => set("filaAguardando", e.target.value)} placeholder="0" /></Field>
-      </div>
-      <Field label="Consumíveis (bolsas, fitas)"><Select value={form.consumiveis} onChange={(e) => set("consumiveis", e.target.value)}><option value="ok">OK</option><option value="baixo">Estoque baixo</option><option value="repor">Repor urgente</option></Select></Field>
-      <Toggle label="Incidente de segurança?" value={form.incidenteSeg} onChange={(v) => set("incidenteSeg", v)} descValue={form.incidenteSegDesc} onDescChange={(v) => set("incidenteSegDesc", v)} descPlaceholder="Descreva o incidente / quase-acidente" />
-      <Toggle label="Equipamento com problema?" value={form.equipProblema} onChange={(v) => set("equipProblema", v)} descValue={form.equipProblemaDesc} onDescChange={(v) => set("equipProblemaDesc", v)} descPlaceholder="Qual equipamento e o problema" />
-      <Field label="Observação"><TextArea value={form.observacao} onChange={(e) => set("observacao", e.target.value)} placeholder="Observação livre para o próximo turno..." /></Field>
-      <SubmitBtn onClick={onSubmit} />
-    </>
-  );
-}
-
-function FormAudaces({ form, set, onSubmit }) {
-  return (
-    <>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12 }}>
-        <Field label="Matrícula"><TextInput value={form.matricula} onChange={(e) => set("matricula", e.target.value)} placeholder="Ex: 3651" /></Field>
-        <Field label="Turno"><Select value={form.turno} onChange={(e) => set("turno", e.target.value)}>{TURNOS.map((t) => <option key={t}>{t}</option>)}</Select></Field>
-      </div>
-      <Field label="Programa / arquivo rodando"><TextInput value={form.programaRodando} onChange={(e) => set("programaRodando", e.target.value)} placeholder="Ex: Programa MX-220" /></Field>
-      <Field label="Painéis cortados por carro"><TextArea value={form.paineisPorCarro} onChange={(e) => set("paineisPorCarro", e.target.value)} placeholder="Ex: Carro A: 12 / Carro B: 8 (pela metade)" /></Field>
-      <Toggle label="Parada de máquina no turno?" value={form.paradaMaquina} onChange={(v) => set("paradaMaquina", v)} descValue={form.paradaMaquinaDesc} onDescChange={(v) => set("paradaMaquinaDesc", v)} descPlaceholder="Motivo e duração da parada" />
-      <Toggle label="Manutenção pendente?" value={form.manutencaoPendente} onChange={(v) => set("manutencaoPendente", v)} descValue={form.manutencaoPendenteDesc} onDescChange={(v) => set("manutencaoPendenteDesc", v)} descPlaceholder="O que precisa de manutenção" />
-      <Field label="Observação"><TextArea value={form.observacao} onChange={(e) => set("observacao", e.target.value)} placeholder="Observação livre para o próximo turno..." /></Field>
-      <SubmitBtn onClick={onSubmit} />
-    </>
-  );
-}
-
-function SubmitBtn({ onClick }) {
-  return (
-    <button onClick={onClick} style={{
-      width: "100%", padding: "13px", borderRadius: 10, border: "none",
-      background: C.blue, color: C.white, fontSize: 15, fontWeight: 700,
-      cursor: "pointer", marginTop: 6,
-    }}>Registrar passagem de turno</button>
-  );
-}
-
-// ================= DASHBOARD =================
 function Badge({ children, tone }) {
   const tones = {
     danger: { bg: C.dangerLight, fg: C.danger },
@@ -231,174 +120,227 @@ function Badge({ children, tone }) {
     neutral: { bg: C.bluePale, fg: C.blue },
   };
   const t = tones[tone] || tones.neutral;
-  return <span style={{ background: t.bg, color: t.fg, fontSize: 12, fontWeight: 700, padding: "3px 9px", borderRadius: 7, display: "inline-block" }}>{children}</span>;
+  return <span style={{ background: t.bg, color: t.fg, fontSize: 12, fontWeight: 700, padding: "4px 10px", borderRadius: 6, display: "inline-block" }}>{children}</span>;
 }
 
-function alertasDoRegistro(r) {
-  const a = [];
-  if (r.incidenteSeg) a.push({ tone: "danger", txt: "⚠️ Incidente de segurança" });
-  if (r.equipProblema) a.push({ tone: "danger", txt: "🔧 Equipamento com problema" });
-  if (r.paradaMaquina) a.push({ tone: "danger", txt: "⏸️ Parada de máquina" });
-  if (r.manutencaoPendente) a.push({ tone: "warning", txt: "🔧 Manutenção pendente" });
-  if (r.lamina === "trocar") a.push({ tone: "warning", txt: "🔪 Trocar lâmina" });
-  if (r.statusPU === "repor") a.push({ tone: "warning", txt: "🧴 Repor PU" });
-  if (r.statusPU === "baixo") a.push({ tone: "warning", txt: "🧴 PU baixo" });
-  if (r.consumiveis === "repor") a.push({ tone: "warning", txt: "📦 Repor consumíveis" });
-  if (r.consumiveis === "baixo") a.push({ tone: "warning", txt: "📦 Consumíveis baixos" });
-  return a;
-}
-
-function DashCardSetor({ setor, registro }) {
-  const meta = SETORES.find((s) => s.id === setor);
-  if (!registro) {
-    return (
-      <Card>
-        <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 8 }}>{meta.icon} {meta.nome}</div>
-        <div style={{ color: C.grayDark, fontSize: 13 }}>Nenhuma passagem registrada ainda.</div>
-      </Card>
-    );
-  }
-  const alertas = alertasDoRegistro(registro);
+// ============= ANOMALIAS TAB =============
+function AnomaliaForm({ form, set, onSubmit }) {
   return (
-    <Card>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14, gap: 12 }}>
-        <div style={{ fontSize: 18, fontWeight: 800, color: C.text }}>{meta.icon} {meta.nome}</div>
-        <div style={{ textAlign: "right", fontSize: 12, color: C.grayDark, flexShrink: 0 }}>
-          <div style={{ fontWeight: 600 }}>{registro.turno}</div>
-          <div style={{ fontSize: 11 }}>{registro.data} · {registro.hora}</div>
-        </div>
+    <>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14, marginBottom: 14 }}>
+        <Field label="Matrícula"><TextInput value={form.matricula} onChange={(e) => set("matricula", e.target.value)} placeholder="Ex: 3789" /></Field>
+        <Field label="Turno"><Select value={form.turno} onChange={(e) => set("turno", e.target.value)}>{TURNOS.map((t) => <option key={t}>{t}</option>)}</Select></Field>
+        <Field label="Setor"><Select value={form.setor} onChange={(e) => set("setor", e.target.value)}>{SETORES.map((s) => <option key={s.id} value={s.id}>{s.nome}</option>)}</Select></Field>
       </div>
-
-      {alertas.length > 0 && (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 7, marginBottom: 14 }}>
-          {alertas.map((a, i) => <Badge key={i} tone={a.tone}>{a.txt}</Badge>)}
-        </div>
-      )}
-
-      <div style={{ fontSize: 15, lineHeight: 1.8, color: C.text, marginBottom: 14, background: C.gray, borderRadius: 10, padding: "12px 14px" }}>
-        {setor === "corte" && (<>
-          <div><b>Cortados:</b> {registro.paineisCortados} | <b>Pendentes:</b> {registro.paineisPendentes}</div>
-          <div><b>Material:</b> {registro.materialEstoque}</div>
-        </>)}
-        {setor === "embolsamento" && (<>
-          <div><b>Embolsados:</b> {registro.paineisEmbolsados} | <b>Fila:</b> {registro.filaAguardando}</div>
-        </>)}
-        {setor === "audaces" && (<>
-          <div><b>Programa:</b> {registro.programaRodando}</div>
-          <div><b>Por carro:</b> {registro.paineisPorCarro}</div>
-        </>)}
+      <Field label="Tipo de Anomalia"><Select value={form.tipoAnomalia} onChange={(e) => set("tipoAnomalia", e.target.value)}>{TIPOS_ANOMALIA.map((t) => <option key={t}>{t}</option>)}</Select></Field>
+      <Field label="Descrição"><TextArea value={form.descricao} onChange={(e) => set("descricao", e.target.value)} placeholder="O que aconteceu exatamente?" /></Field>
+      <Field label="Causa Raiz"><TextArea value={form.causaRaiz} onChange={(e) => set("causaRaiz", e.target.value)} placeholder="Por que aconteceu? (opcional)" rows={2} /></Field>
+      <Field label="Ação Tomada"><TextArea value={form.acaoTomada} onChange={(e) => set("acaoTomada", e.target.value)} placeholder="O que foi feito pra resolver?" /></Field>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14, marginBottom: 14 }}>
+        <Field label="Resultado"><Select value={form.resultado} onChange={(e) => set("resultado", e.target.value)}><option value="resolvido">Resolvido</option><option value="parcial">Parcialmente Resolvido</option><option value="pendente">Pendente</option></Select></Field>
+        <Field label="Duração da Parada (min)"><TextInput type="number" value={form.duracaoParada} onChange={(e) => set("duracaoParada", e.target.value)} placeholder="0" /></Field>
       </div>
-
-      {registro.observacao && (
-        <div style={{ marginBottom: 12, background: C.bluePale, borderRadius: 10, padding: "12px 14px", fontSize: 13, color: C.text, borderLeft: `4px solid ${C.blue}` }}>
-          <b style={{ color: C.blue }}>📝 Observação:</b> {registro.observacao}
-        </div>
-      )}
-
-      {(registro.incidenteSegDesc || registro.equipProblemaDesc || registro.paradaMaquinaDesc || registro.manutencaoPendenteDesc) && (
-        <div style={{ marginBottom: 12, background: C.dangerLight, borderRadius: 10, padding: "12px 14px", fontSize: 13, color: C.danger, borderLeft: `4px solid ${C.danger}` }}>
-          {registro.incidenteSegDesc && <div>⚠️ <b>Incidente:</b> {registro.incidenteSegDesc}</div>}
-          {registro.equipProblemaDesc && <div>🔧 <b>Equipamento:</b> {registro.equipProblemaDesc}</div>}
-          {registro.paradaMaquinaDesc && <div>⏸️ <b>Parada:</b> {registro.paradaMaquinaDesc}</div>}
-          {registro.manutencaoPendenteDesc && <div>🔧 <b>Manutenção:</b> {registro.manutencaoPendenteDesc}</div>}
-        </div>
-      )}
-
-      <div style={{ fontSize: 12, color: C.grayDark }}>Registrado por <b>mat. {registro.matricula}</b></div>
-    </Card>
+      <button onClick={onSubmit} style={{ width: "100%", padding: "13px", borderRadius: 10, border: "none", background: C.blue, color: C.white, fontSize: 15, fontWeight: 700, cursor: "pointer" }}>Registrar Anomalia</button>
+    </>
   );
 }
 
-function Dashboard({ registros }) {
-  const ultimoPorSetor = (id) => registros.filter((r) => r.setor === id).sort((a, b) => b.id - a.id)[0];
+function AnomaliaHistorico({ anomalias }) {
+  const [filtroSetor, setFiltroSetor] = useState("todos");
+  const lista = anomalias.filter((a) => filtroSetor === "todos" || a.setor === filtroSetor).sort((a, b) => b.id - a.id);
+  
   return (
     <div>
-      <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 6, color: C.text }}>Última passagem por setor</h2>
-      <p style={{ color: C.grayDark, fontSize: 14, marginBottom: 22 }}>O que o turno anterior deixou registrado.</p>
-      <div style={{ 
-        display: "grid", 
-        gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", 
-        gap: 18,
-        "@media (max-width: 768px)": {
-          gridTemplateColumns: "1fr",
-        }
-      }}>
-        {SETORES.map((s) => <DashCardSetor key={s.id} setor={s.id} registro={ultimoPorSetor(s.id)} />)}
+      <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 6, color: C.text }}>Histórico de Anomalias</h2>
+      <p style={{ color: C.grayDark, fontSize: 14, marginBottom: 18 }}>Todos os problemas registrados e resoluções aplicadas.</p>
+      
+      <div style={{ display: "flex", gap: 8, marginBottom: 18, flexWrap: "wrap" }}>
+        <FiltroBtn ativo={filtroSetor === "todos"} onClick={() => setFiltroSetor("todos")}>Todos</FiltroBtn>
+        {SETORES.map((s) => <FiltroBtn key={s.id} ativo={filtroSetor === s.id} onClick={() => setFiltroSetor(s.id)}>{s.nome}</FiltroBtn>)}
       </div>
-    </div>
-  );
-}
 
-// ================= HISTÓRICO =================
-function Historico({ registros }) {
-  const [filtro, setFiltro] = useState("todos");
-  const lista = registros.filter((r) => filtro === "todos" || r.setor === filtro).sort((a, b) => b.id - a.id);
-  return (
-    <div>
-      <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 14 }}>Histórico de passagens</h2>
-      <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
-        <FiltroBtn ativo={filtro === "todos"} onClick={() => setFiltro("todos")}>Todos</FiltroBtn>
-        {SETORES.map((s) => <FiltroBtn key={s.id} ativo={filtro === s.id} onClick={() => setFiltro(s.id)}>{s.icon} {s.nome}</FiltroBtn>)}
-      </div>
-      {lista.length === 0 && <Card><div style={{ color: C.grayDark }}>Nenhum registro.</div></Card>}
+      {lista.length === 0 && <Card><div style={{ color: C.grayDark }}>Nenhuma anomalia registrada.</div></Card>}
+      
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {lista.map((r) => {
-          const meta = SETORES.find((s) => s.id === r.setor);
-          const alertas = alertasDoRegistro(r);
-          return (
-            <Card key={r.id}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
-                <div style={{ fontWeight: 800 }}>{meta.icon} {meta.nome} · {r.turno}</div>
-                <div style={{ fontSize: 12, color: C.grayDark }}>{r.data} · {r.hora} · mat. {r.matricula}</div>
+        {lista.map((a) => (
+          <Card key={a.id}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12, gap: 12, flexWrap: "wrap" }}>
+              <div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: C.text, marginBottom: 4 }}>{a.tipoAnomalia}</div>
+                <div style={{ fontSize: 13, color: C.grayDark }}>{a.data} · {a.hora} · {SETORES.find(s => s.id === a.setor)?.nome}</div>
               </div>
-              {alertas.length > 0 && (
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8 }}>
-                  {alertas.map((a, i) => <Badge key={i} tone={a.tone}>{a.txt}</Badge>)}
-                </div>
-              )}
-              {r.observacao && <div style={{ marginTop: 8, fontSize: 13, color: C.text }}>📝 {r.observacao}</div>}
-            </Card>
-          );
-        })}
+              <Badge tone={a.resultado === "resolvido" ? "success" : a.resultado === "parcial" ? "warning" : "danger"}>
+                {a.resultado === "resolvido" ? "Resolvido" : a.resultado === "parcial" ? "Parcial" : "Pendente"}
+              </Badge>
+            </div>
+
+            <div style={{ background: C.gray, borderRadius: 10, padding: "12px 14px", marginBottom: 12, fontSize: 13, lineHeight: 1.6 }}>
+              <div><b>Descrição:</b> {a.descricao}</div>
+              {a.causaRaiz && <div><b>Causa:</b> {a.causaRaiz}</div>}
+              <div><b>Ação:</b> {a.acaoTomada}</div>
+              {a.duracaoParada && <div><b>Parada:</b> {a.duracaoParada} min</div>}
+            </div>
+
+            <div style={{ fontSize: 12, color: C.grayDark }}>Registrado por mat. {a.matricula}</div>
+          </Card>
+        ))}
       </div>
     </div>
   );
 }
 
+// ============= LICOES APRENDIDAS =============
+function LicoesAprendidas({ licoes, anomalias }) {
+  const [filtroSetor, setFiltroSetor] = useState("todos");
+  const lista = licoes.filter((l) => filtroSetor === "todos" || l.setor === filtroSetor);
+  
+  const licoesComFreq = lista.map((l) => ({
+    ...l,
+    frequencia: anomalias.filter((a) => a.setor === l.setor && a.descricao.toLowerCase().includes(l.problema.toLowerCase())).length,
+  })).sort((a, b) => b.frequencia - a.frequencia);
+
+  return (
+    <div>
+      <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 6, color: C.text }}>Base de Conhecimento</h2>
+      <p style={{ color: C.grayDark, fontSize: 14, marginBottom: 18 }}>Problemas recorrentes e soluções que funcionaram. Conhecimento compartilhado da linha.</p>
+
+      <div style={{ display: "flex", gap: 8, marginBottom: 18, flexWrap: "wrap" }}>
+        <FiltroBtn ativo={filtroSetor === "todos"} onClick={() => setFiltroSetor("todos")}>Todos</FiltroBtn>
+        {SETORES.map((s) => <FiltroBtn key={s.id} ativo={filtroSetor === s.id} onClick={() => setFiltroSetor(s.id)}>{s.nome}</FiltroBtn>)}
+      </div>
+
+      {licoesComFreq.length === 0 && <Card><div style={{ color: C.grayDark }}>Nenhuma lição registrada ainda.</div></Card>}
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 16 }}>
+        {licoesComFreq.map((l) => (
+          <Card key={l.id} style={{ borderLeft: "4px solid " + C.blue }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12, gap: 12 }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 16, fontWeight: 800, color: C.text, marginBottom: 4 }}>{l.problema}</div>
+                <div style={{ fontSize: 12, color: C.grayDark }}>{SETORES.find(s => s.id === l.setor)?.nome}</div>
+              </div>
+              <Badge tone="neutral">{l.frequencia} ocorrências</Badge>
+            </div>
+
+            <div style={{ background: C.bluePale, borderRadius: 10, padding: "12px 14px", marginBottom: 12, fontSize: 13, lineHeight: 1.6 }}>
+              <div style={{ marginBottom: 8 }}>
+                <b style={{ color: C.blue }}>Causa:</b> {l.causa}
+              </div>
+              <div>
+                <b style={{ color: C.blue }}>Ação Padrão:</b> {l.acao}
+              </div>
+            </div>
+
+            <div style={{ fontSize: 11, color: C.grayDark }}>Última ocorrência: {l.ultimaOcorrencia}</div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ============= ANALYTICS =============
+function Analise({ anomalias }) {
+  const total = anomalias.length;
+  const resolvidas = anomalias.filter((a) => a.resultado === "resolvido").length;
+  const tempoMedioParada = anomalias.filter((a) => a.duracaoParada).reduce((sum, a) => sum + parseInt(a.duracaoParada || 0), 0) / anomalias.filter((a) => a.duracaoParada).length || 0;
+
+  const anomaliasPerSetor = SETORES.map((s) => ({
+    setor: s.nome,
+    count: anomalias.filter((a) => a.setor === s.id).length,
+  }));
+
+  const tiposFreq = {};
+  anomalias.forEach((a) => {
+    tiposFreq[a.tipoAnomalia] = (tiposFreq[a.tipoAnomalia] || 0) + 1;
+  });
+  const tiposOrdenados = Object.entries(tiposFreq).sort((a, b) => b[1] - a[1]);
+
+  return (
+    <div>
+      <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 6, color: C.text }}>Análise de Anomalias</h2>
+      <p style={{ color: C.grayDark, fontSize: 14, marginBottom: 22 }}>Indicadores de desempenho e padrões da linha de produção.</p>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 24 }}>
+        <Card style={{ borderTop: "4px solid " + C.success }}>
+          <div style={{ fontSize: 32, fontWeight: 800, color: C.success }}>{total}</div>
+          <div style={{ fontSize: 13, color: C.grayDark, marginTop: 4 }}>Total de Anomalias</div>
+        </Card>
+        <Card style={{ borderTop: "4px solid " + C.blue }}>
+          <div style={{ fontSize: 32, fontWeight: 800, color: C.blue }}>{resolvidas}</div>
+          <div style={{ fontSize: 13, color: C.grayDark, marginTop: 4 }}>Resolvidas ({((resolvidas/total)*100).toFixed(0)}%)</div>
+        </Card>
+        <Card style={{ borderTop: "4px solid " + C.warning }}>
+          <div style={{ fontSize: 32, fontWeight: 800, color: C.warning }}>{tempoMedioParada.toFixed(0)}</div>
+          <div style={{ fontSize: 13, color: C.grayDark, marginTop: 4 }}>Tempo Médio de Parada (min)</div>
+        </Card>
+      </div>
+
+      <Card style={{ marginBottom: 16 }}>
+        <h3 style={{ fontSize: 16, fontWeight: 800, marginBottom: 14, color: C.text }}>Anomalias por Setor</h3>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {anomaliasPerSetor.map((item) => (
+            <div key={item.setor}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                <span style={{ fontWeight: 600, color: C.text }}>{item.setor}</span>
+                <span style={{ fontWeight: 700, color: C.blue }}>{item.count}</span>
+              </div>
+              <div style={{ height: 8, background: C.gray, borderRadius: 4, overflow: "hidden" }}>
+                <div style={{ height: "100%", background: C.blue, width: (item.count / total) * 100 + "%" }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      <Card>
+        <h3 style={{ fontSize: 16, fontWeight: 800, marginBottom: 14, color: C.text }}>Tipos de Anomalia (Top 5)</h3>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {tiposOrdenados.slice(0, 5).map(([tipo, count]) => (
+            <div key={tipo} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 12px", background: C.gray, borderRadius: 8 }}>
+              <span style={{ color: C.text, fontSize: 13 }}>{tipo}</span>
+              <Badge tone="neutral">{count}</Badge>
+            </div>
+          ))}
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+// ============= HELPER COMPONENTS =============
 function FiltroBtn({ ativo, onClick, children }) {
   return (
     <button onClick={onClick} style={{
       padding: "8px 14px", borderRadius: 9, fontSize: 13, fontWeight: 700, cursor: "pointer",
-      border: `1px solid ${ativo ? C.blue : C.grayMid}`,
+      border: "1px solid " + (ativo ? C.blue : C.grayMid),
       background: ativo ? C.blue : C.white, color: ativo ? C.white : C.grayDark,
     }}>{children}</button>
   );
 }
 
-// ================= APP =================
+// ============= MAIN APP =============
 export default function App() {
-  const [aba, setAba] = useState("dashboard");
-  const [setorAtivo, setSetorAtivo] = useState("corte");
-  const [registros, setRegistros] = useState(MOCK);
+  const [aba, setAba] = useState("anomalias");
+  const [anomalias, setAnomalias] = useState(MOCK_ANOMALIAS);
+  const [licoes, setLicoes] = useState(MOCK_LICOES);
+  const [formAnomalia, setFormAnomalia] = useState(FORM_ANOMALIA);
 
-  const [fCorte, setFCorte] = useState(FORM_CORTE);
-  const [fEmb, setFEmb] = useState(FORM_EMBOLSAMENTO);
-  const [fAud, setFAud] = useState(FORM_AUDACES);
+  const setAnomalia = (k, v) => setFormAnomalia((p) => ({ ...p, [k]: v }));
 
-  const setCorte = (k, v) => setFCorte((p) => ({ ...p, [k]: v }));
-  const setEmb = (k, v) => setFEmb((p) => ({ ...p, [k]: v }));
-  const setAud = (k, v) => setFAud((p) => ({ ...p, [k]: v }));
-
-  const registrar = (setor, form, reset, initial) => {
-    if (!form.matricula.trim()) { alert("Informe a matrícula."); return; }
-    const novo = {
-      ...form, id: Date.now(), setor,
+  const registrarAnomalia = () => {
+    if (!formAnomalia.matricula.trim() || !formAnomalia.descricao.trim()) {
+      alert("Preencha matrícula e descrição");
+      return;
+    }
+    const nova = {
+      ...formAnomalia, id: Date.now(),
       data: new Date().toLocaleDateString("pt-BR"),
       hora: new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
     };
-    setRegistros((p) => [...p, novo]);
-    reset(initial);
-    setAba("dashboard");
+    setAnomalias((p) => [...p, nova]);
+    setFormAnomalia(FORM_ANOMALIA);
+    setAba("anomalias_historico");
   };
 
   const tabBtn = (id, label) => (
@@ -413,51 +355,43 @@ export default function App() {
 
   return (
     <div style={{ minHeight: "100vh", background: C.gray, overflowX: "hidden" }}>
-      {/* Header */}
       <div style={{ background: C.blue, padding: "12px 16px", boxShadow: "0 2px 8px rgba(0,0,0,0.12)", position: "sticky", top: 0, zIndex: 100 }}>
         <div style={{ maxWidth: 1240, margin: "0 auto" }}>
-          {/* Logo + Título */}
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
             <img 
               src={LOGO} 
               alt="AGP" 
               style={{ height: 28, filter: "brightness(0) invert(1)" }} 
-              onError={(e) => { 
-                e.target.style.display = "none"; 
-              }} 
+              onError={(e) => { e.target.style.display = "none"; }} 
             />
             <div style={{ flex: 1 }}>
               <div style={{ color: C.white, fontSize: 20, fontWeight: 800, lineHeight: 1, margin: 0 }}>AGP TrocaTurno</div>
-              <div style={{ color: "#FFFFFFAA", fontSize: 11, margin: 0 }}>Passagem de Turno · Setor Opaco</div>
+              <div style={{ color: "#FFFFFFAA", fontSize: 11, margin: 0 }}>Passagem de Turno · Anomalias · Lições Aprendidas</div>
             </div>
           </div>
-          {/* Tabs */}
           <div style={{ display: "flex", gap: 4, overflowX: "auto", paddingBottom: 2 }}>
-            {tabBtn("dashboard", "📊 Dashboard")}
-            {tabBtn("registrar", "📝 Registrar")}
-            {tabBtn("historico", "📋 Histórico")}
+            {tabBtn("anomalias", "Registrar Anomalia")}
+            {tabBtn("anomalias_historico", "Histórico")}
+            {tabBtn("licoes", "Base de Conhecimento")}
+            {tabBtn("analise", "Análise")}
           </div>
         </div>
       </div>
 
-      {/* Conteúdo */}
       <div style={{ maxWidth: 1240, margin: "0 auto", padding: "20px 16px 60px" }}>
-        {aba === "dashboard" && <Dashboard registros={registros} />}
-        {aba === "historico" && <Historico registros={registros} />}
-        {aba === "registrar" && (
+        {aba === "anomalias" && (
           <div>
-            <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4, color: C.text }}>Registrar passagem de turno</h2>
-            <p style={{ color: C.grayDark, fontSize: 13, marginBottom: 18 }}>Preencha o formulário do setor correspondente.</p>
-            <div style={{ display: "flex", gap: 8, marginBottom: 18, flexWrap: "wrap", overflowX: "auto" }}>
-              {SETORES.map((s) => <FiltroBtn key={s.id} ativo={setorAtivo === s.id} onClick={() => setSetorAtivo(s.id)}>{s.icon} {s.nome}</FiltroBtn>)}
-            </div>
+            <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4, color: C.text }}>Registrar Anomalia</h2>
+            <p style={{ color: C.grayDark, fontSize: 13, marginBottom: 18 }}>Documente problemas encontrados durante o turno para construir a base de conhecimento da linha.</p>
             <Card style={{ maxWidth: 800 }}>
-              {setorAtivo === "corte" && <FormCorte form={fCorte} set={setCorte} onSubmit={() => registrar("corte", fCorte, setFCorte, FORM_CORTE)} />}
-              {setorAtivo === "embolsamento" && <FormEmbolsamento form={fEmb} set={setEmb} onSubmit={() => registrar("embolsamento", fEmb, setFEmb, FORM_EMBOLSAMENTO)} />}
-              {setorAtivo === "audaces" && <FormAudaces form={fAud} set={setAud} onSubmit={() => registrar("audaces", fAud, setFAud, FORM_AUDACES)} />}
+              <AnomaliaForm form={formAnomalia} set={setAnomalia} onSubmit={registrarAnomalia} />
             </Card>
           </div>
         )}
+
+        {aba === "anomalias_historico" && <AnomaliaHistorico anomalias={anomalias} />}
+        {aba === "licoes" && <LicoesAprendidas licoes={licoes} anomalias={anomalias} />}
+        {aba === "analise" && <Analise anomalias={anomalias} />}
       </div>
     </div>
   );
